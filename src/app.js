@@ -10,9 +10,13 @@ app.use(cors({
 }))
 
 app.use(express.json({limit: "16kbs"}))
+
+// url
 app.use(express.urlencoded({extended:true, limit:
     "16kbs"
 }))
+
+// images
 
 app.use(express.static("public"))
 
