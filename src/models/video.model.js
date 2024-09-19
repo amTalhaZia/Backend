@@ -1,51 +1,43 @@
 import mongoose, { Schema } from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
-const userSchema = new Schema(
+const videoSchema  = new mongoose.Schema(
     {
-        username: {
-            type: String,
-            required: true,
-            unique: true,
-            lowercase: true,
-            trim: true,
-            index: true
-        },
-        email: {
-            type: String,
-            required: true,
-            unique: true,
-            lowercase: true,
-            trim: true,
-        },
-        fullname: {
-            type: String,
-            required: true,
-            unique: true,
-            trim: true,
-            index: true
-        },
-        avatar: {
-            type: String,
-            required: true,
-        },
-        coverImage: {
-            type: string
-        },
-        watchHistory: [
-            {
-                type: Schema.Types.ObjectId,
-                ref: "video"
-            }
-        ],
-        password: {
-            type: string,
-            required: [true, "password  is  required"]
-        },
-        refreshToken: {
-            type: string
-        }
-
-    },{timestamps: true}
+      videoFile: {
+        type: String,
+        required: true
+      },
+      thumbnail: {
+        type: String,
+        required: true
+      },
+      title: {
+        type: String,
+        required: true
+      },
+      edescription: {
+        type: String,
+        required: true
+      },
+      duration: {
+        type: Number,
+        required: true
+      },
+      views: {
+        type: Number,
+        default: 0
+      },
+      isPublished: {
+        type: boolean,
+        default: true
+      },
+      owner: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+      }
+    },{timestamps:true}
 )
 
-export const User = mongoose.model("User", userSchema)
+videoSchema.plugin(mongooseAggregatePaginate)
+
+export const Video = mongoose.model("Video", videoSchema)

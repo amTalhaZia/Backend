@@ -1,40 +1,77 @@
 import mongoose, { Schema } from "mongoose";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
-const videoSchema  = new mongoose.Schema(
-    {
-      videoFile: {
-        type: String,
-        required: true
-      },
-      thumbnail: {
-        type: String,
-        required: true
-      },
-      title: {
-        type: String,
-        required: true
-      },
-      edescription: {
-        type: String,
-        required: true
-      },
-      duration: {
-        type: Number,
-        required: true
-      },
-      views: {
-        type: Number,
-        default: 0
-      },
-      isPublished: {
-        type: boolean,
-        default: true
-      },
-      owner: {
+const userSchema = new Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      index: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    fullname: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      index: true,
+    },
+    avatar: {
+      type: String,
+      required: true,
+    },
+    coverImage: {
+      type: String,
+    },
+    watchHistory: [
+      {
         type: Schema.Types.ObjectId,
-        ref: "User"
-      }
-    },{timestamps:true}
-)
+        ref: "video",
+      },
+    ],
+    password: {
+      type: String,
+      required: [true, "Password is required"],
+    },
+    refreshToken: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
 
-export const Video = mongoose.model("Video", videoSchema)
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, 10); 
+  next();
+});
+
+userSchema.methods.isPasswordMatch = async function (password) {
+  return await bcrypt.compare(password, this.password); 
+};
+
+userSchema.methods.generateAccessToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+      email: this.email,
+      username: this.username,
+      fullname: this.fullname,
+    },
+    
+  );
+};
+
+
+export const User = mongoose.model("User", userSchema);
