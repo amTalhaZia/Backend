@@ -9,11 +9,11 @@ app.use(cors({
     cridentials: true
 }))
 
-app.use(express.json({limit: "16kbs"}))
+app.use(express.json({limit: "1mb"}))
 
 // url
 app.use(express.urlencoded({extended:true, limit:
-    "16kbs"
+    "1mb"
 }))
 
 
